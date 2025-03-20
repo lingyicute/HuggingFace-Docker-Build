@@ -17,6 +17,12 @@ RUN apt-get update && yes | unminimize && apt-get dist-upgrade -y && \
     apt-get update && apt-get install -y ngrok && \
     echo '#1000 ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/99-nopasswd-uid1000 && \
     chmod 440 /etc/sudoers.d/99-nopasswd-uid1000 && \
-    chown -R lingyicute:lingyicute /home/lingyicute
+    chown -R lingyicute:lingyicute /home/lingyicute && \
+    apt-get install tigervnc-standalone-server -y && apt-get clean
+
+# 安装noVNC
+RUN git clone https://github.com/novnc/noVNC /opt/noVNC && \
+    git clone https://github.com/novnc/websockify /opt/noVNC/utils/websockify && \
+    ln -s /opt/noVNC/vnc.html /opt/noVNC/index.html
 
 ENTRYPOINT ["tmux"]
