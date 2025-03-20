@@ -39,3 +39,19 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Pull built image for merge
+        run: |
+          docker pull ghcr.io/${{ github.repository_owner }}/huggingface-docker-build:latest
+
+      - name: Export and import image to merge layers
+        run: |
+          # 创建容器并获取其ID
+          container_id=$(docker create ghcr.io/${{ github.repository_owner }}/huggingface-docker-build:latest)
+          # 导出容器的文件系统，并通过 docker import 生成合并层的新镜像
+          docker export $container_id | docker import - ghcr.io/${{ github.repository_owner }}/huggingface-docker-build:merged
+          docker rm $container_id
+
+      - name: Push merged image
+        run: |
+          docker push ghcr.io/${{ github.repository_owner }}/huggingface-docker-build:merged
